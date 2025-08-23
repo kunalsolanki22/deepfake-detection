@@ -1,0 +1,6 @@
+outs:
+- md5: 5dde843cfab2690dbc868afd695b59ec.dir
+  size: 10156321255
+  nfiles: 6531
+  hash: md5
+  path: Celeb-DF-v2
