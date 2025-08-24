@@ -4,3 +4,4 @@ processed_faces/
 master_data.csv
 report/
 .dvc/cache/
+.dvc/config
