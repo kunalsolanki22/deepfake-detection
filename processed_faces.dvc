@@ -1,0 +1,6 @@
+outs:
+- md5: 69f66db0255a7042ec0f99206a3ace68.dir
+  size: 584086372
+  nfiles: 65532
+  hash: md5
+  path: processed_faces

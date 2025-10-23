@@ -1,7 +1,27 @@
 FaceForensics++_C23/
 Celeb-DF-v2/
-processed_faces/
 master_data.csv
+master_data_colab.csv
+processed_faces/
 report/
 .dvc/cache/
 .dvc/config
+.dvc/tmp/
+
+myenv/
+
+# Ignore model weights, logs, and checkpoints
+*.pth
+*.ckpt
+*.log
+*.pt
+*.npy
+
+# Ignore large data and intermediates
+*.pkl
+*.json
+
+# Ignore generated folders
+__pycache__/
+*.pyc
+.DS_Store

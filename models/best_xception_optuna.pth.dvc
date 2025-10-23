@@ -1,0 +1,5 @@
+outs:
+- md5: 44af9eef352b98f96c819ded3e10ea10
+  size: 87741375
+  hash: md5
+  path: best_xception_optuna.pth

@@ -1,0 +1,5 @@
+outs:
+- md5: e7aad71062c16aed11601368525fa5df
+  size: 2115297
+  hash: md5
+  path: sampled_frames.pkl
