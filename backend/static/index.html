@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepFake Detector</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+        h2 { color: #333; margin-bottom: 20px; }
+        .upload-box {
+            border: 2px dashed #cbd5e0;
+            padding: 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .upload-box:hover { border-color: #4a90e2; background: #f7fbff; }
+        button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+        }
+        button:disabled { background: #ccc; }
+        .result {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+        }
+        .Real { background: #d1fae5; color: #065f46; }
+        .Fake { background: #fee2e2; color: #991b1b; }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>🕵️‍♂️ DeepFake Detector</h2>
+        
+        <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+            <p id="fileName">Click to Upload Video</p>
+            <input type="file" id="fileInput" accept="video/*" style="display:none">
+        </div>
+
+        <button id="scanBtn" onclick="uploadVideo()">🔍 Scan Video</button>
+        
+        <div class="loader" id="loader"></div>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileName');
+        const resultDiv = document.getElementById('result');
+        const loader = document.getElementById('loader');
+        const scanBtn = document.getElementById('scanBtn');
+
+        fileInput.addEventListener('change', () => {
+            if(fileInput.files.length > 0) {
+                fileNameDisplay.innerText = "📄 " + fileInput.files[0].name;
+            }
+        });
+
+        async function uploadVideo() {
+            if (fileInput.files.length === 0) {
+                alert("Please select a video first!");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append("file", file);
+
+            // UI State: Loading
+            resultDiv.style.display = 'none';
+            loader.style.display = 'block';
+            scanBtn.disabled = true;
+            scanBtn.innerText = "Scanning...";
+
+            try {
+                const response = await fetch("/predict_video/", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                // UI State: Result
+                loader.style.display = 'none';
+                scanBtn.disabled = false;
+                scanBtn.innerText = "🔍 Scan Video";
+                resultDiv.style.display = 'block';
+
+                if (data.error) {
+                    resultDiv.innerText = "Error: " + data.error;
+                    resultDiv.className = "result";
+                } else {
+                    const confidence = (data.confidence * 100).toFixed(2);
+                    resultDiv.className = "result " + data.label;
+                    resultDiv.innerHTML = `Result: ${data.label}<br><small>Confidence: ${confidence}%</small>`;
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert("Failed to connect to server.");
+                loader.style.display = 'none';
+                scanBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

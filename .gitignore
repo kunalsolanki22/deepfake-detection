@@ -1,27 +1,39 @@
-FaceForensics++_C23/
-Celeb-DF-v2/
-master_data.csv
-master_data_colab.csv
-processed_faces/
-report/
-.dvc/cache/
-.dvc/config
-.dvc/tmp/
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Build outputs
+build
+.cache
 
 myenv/
 
-# Ignore model weights, logs, and checkpoints
-*.pth
-*.ckpt
-*.log
-*.pt
-*.npy
-
-# Ignore large data and intermediates
-*.pkl
-*.json
-
-# Ignore generated folders
+node_modules/
+venv/
 __pycache__/
 *.pyc
-.DS_Store

@@ -3,3 +3,15 @@ opencv-python
 dvc[gdrive]
 mtcnn
 tensorflow
+torch
+timm
+albumentations
+mediapipe
+fastapi
+uvicorn
+numpy
+Pillow
+inference
+lucide-react 
+framer-motion
+react-vertical-timeline-component 
