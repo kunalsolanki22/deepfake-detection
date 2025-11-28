@@ -6,7 +6,7 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 import mediapipe as mp
 import base64
-
+import time
 # ===========================
 # 1. MODEL ARCHITECTURE
 # ===========================
@@ -103,6 +103,7 @@ def encode_frame_to_base64(frame):
 # ===========================
 # 4. MAIN VIDEO INFERENCE
 # ===========================
+
 def predict_video(model, video_path, device, transform):
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
@@ -112,23 +113,30 @@ def predict_video(model, video_path, device, transform):
     analyzed_frames = []
     frame_count = 0
 
-    # Save at most 4 visual frames
-    frames_to_save = 4
+    MAX_FRAMES = 80               # Hard limit → prevents Render freeze
+    SAVE_LIMIT = 4                # Max frames saved for UI
+    START_TIME = time.time()
+    TIME_LIMIT = 15               # 15 seconds max inference time
 
     while True:
+        # ---------- TIMEOUT ----------
+        if time.time() - START_TIME > TIME_LIMIT:
+            print("⛔ TIMEOUT: Returning partial results")
+            break
+
         ret, frame = cap.read()
         if not ret:
             break
 
         frame_count += 1
 
-        # Much better sampling strategy
-        if frame_count <= 30:
-            process_this = True
-        else:
-            process_this = (frame_count % 5 == 0)
+        # ---------- Stop after MAX_FRAMES ----------
+        if frame_count > MAX_FRAMES:
+            print("⚠️ MAX FRAME LIMIT REACHED")
+            break
 
-        if not process_this:
+        # Process first 30 frames, then sample every 5th
+        if frame_count > 30 and (frame_count % 5 != 0):
             continue
 
         faces_data = extract_faces_with_bbox(frame)
@@ -147,26 +155,19 @@ def predict_video(model, video_path, device, transform):
                     fake_prob = probs[0, 1].item()
                     predictions.append(fake_prob)
 
-                # Visuals
                 color = (0, 0, 255) if fake_prob > 0.5 else (0, 255, 0)
-                label = f"FAKE {fake_prob*100:.1f}%" if fake_prob > 0.5 else f"REAL {(1-fake_prob)*100:.1f}%"
+                label = f"{'FAKE' if fake_prob>0.5 else 'REAL'} {fake_prob*100:.1f}%"
 
-                cv2.rectangle(vis_frame, (x, y), (x+w, y+h), color, 3)
-
-                # Label box
-                text_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)[0]
-                cv2.rectangle(vis_frame, (x, y - 30), (x + text_size[0], y), color, -1)
+                cv2.rectangle(vis_frame, (x, y), (x+w, y+h), color, 2)
                 cv2.putText(vis_frame, label, (x, y - 10),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255,255,255), 2)
 
             except:
                 continue
 
-        # Save up to 4 annotated frames
-        if len(analyzed_frames) < frames_to_save:
+        if len(analyzed_frames) < SAVE_LIMIT:
             h, w = vis_frame.shape[:2]
-            scale = 640 / w
-            resized = cv2.resize(vis_frame, (640, int(h * scale)))
+            resized = cv2.resize(vis_frame, (480, int(h * (480 / w))))
             analyzed_frames.append(encode_frame_to_base64(resized))
 
     cap.release()
@@ -174,7 +175,6 @@ def predict_video(model, video_path, device, transform):
     if len(predictions) == 0:
         return {"label": "No Faces", "confidence": 0.0, "frames": []}
 
-    # Robust aggregation
     score = float(np.percentile(predictions, 70))
 
     return {
