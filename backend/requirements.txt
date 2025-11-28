@@ -1,10 +1,15 @@
 fastapi
 uvicorn
 python-multipart
-torch
-torchvision
+
+# CPU-only PyTorch (MUCH smaller)
+torch==2.1.0+cpu
+torchvision==0.16.0+cpu
+--extra-index-url https://download.pytorch.org/whl/cpu
+
 opencv-python-headless
 mediapipe
 albumentations
 timm
 numpy
+Pillow
