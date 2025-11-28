@@ -87,6 +87,8 @@ function App() {
   }, [loading, scannedFrames]);
 
   const handleUpload = async (e) => {
+    const API_URL = "https://deepfake-detection-1-4z6c.onrender.com";
+
     const f = e.target.files[0];
     if (!f) return;
     setFile(f); setLoading(true); setResult(null); setError(null); setScannedFrames([]);
@@ -98,9 +100,13 @@ function App() {
 
     try {
       const [res] = await Promise.all([
-        fetch('http://127.0.0.1:8000/predict_video/', { method: 'POST', body: formData }),
-        new Promise(r => setTimeout(r, 2000)) // Min 2s delay for UX
+        fetch(`${API_URL}/predict_video/`, { 
+          method: 'POST',
+          body: formData
+        }),
+        new Promise(r => setTimeout(r, 2000))
       ]);
+
       
       if (!res.ok) throw new Error(`Server Error: ${res.status}`);
       
