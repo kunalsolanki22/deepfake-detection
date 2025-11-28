@@ -11,5 +11,5 @@ opencv-python-headless
 mediapipe
 albumentations
 timm
-numpy
+numpy==1.26.4
 Pillow
