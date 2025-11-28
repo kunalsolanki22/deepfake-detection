@@ -44,8 +44,8 @@ export const projectMilestones = [
 ];
 
 export const finalMetrics = {
-  accuracy: "95.52%",
+  accuracy: "93.52%",
   auc: "0.9908",
-  precision: "96.59%",
-  recall: "96.65%"
+  precision: "92.59%",
+  recall: "94.65%"
 };
