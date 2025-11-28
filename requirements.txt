@@ -12,5 +12,3 @@ uvicorn
 numpy
 Pillow
 inference 
-framer-motion
-react-vertical-timeline-component 
